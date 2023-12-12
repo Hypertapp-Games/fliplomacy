@@ -45,6 +45,7 @@ public class ToolSolve : MonoBehaviour
         floppyPosition.ob = floppy;
 
         CreateLevel();
+        BackTracking();
     }
    
     void CreateLevel()
@@ -64,6 +65,10 @@ public class ToolSolve : MonoBehaviour
                 char tileType = _allCells[i, j].typeTile[0];
                 switch (tileType)
                 {
+                    case '0':
+                        _allCells[i, j].typeTile = "2";
+                        disappearingTiles.Add(_allCells[i, j]);
+                        break;
                     case '1':
                         flagTiles.Add(_allCells[i, j]);
                         _allCells[i, j].typeTile = "10";
@@ -100,20 +105,25 @@ public class ToolSolve : MonoBehaviour
     
     [SerializeField] private TileData floppyPosition = new TileData(0,0,"0",null);
     private TileData disappearingTile = new TileData(0,0,"20",null);
-    void FloppyMove(int direction_X, int direction_Y)
+    bool FloppyMove(int direction_X, int direction_Y, TileData[,] tempallcell, TileData tempfloppy)
     {
+        _allCells = tempallcell;
+        floppyPosition = tempfloppy;
         var nextX = floppyPosition.x + direction_X;
         var nextY = floppyPosition.y + direction_Y;
         List<TileData> allFlagChanging = new List<TileData>();
 
+        bool canMove = false;
         if (CheckTileJumpOn(direction_X, direction_Y,ref nextX, ref nextY, allFlagChanging, ref disappearingTile))
         {
             floppyPosition.x = nextX;
             floppyPosition.y = nextY;
             floppyPosition.ob.transform.position = new Vector3(floppyPosition.x, floppyPosition.y);
+            canMove = true;
         }
 
         LoadTileVisual();
+        return canMove;
     }
     
     bool CheckTileJumpOn(int direction_X , int direction_Y, ref int tileX,  ref int tileY, List<TileData> allFlagChanging, ref TileData disappearingTile)
@@ -454,41 +464,42 @@ public class ToolSolve : MonoBehaviour
          }
      }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            OnSwipeLeft();
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            OnSwipeRight();
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            OnSwipeTop();
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            OnSwipeBottom();
-        }
-    }
-
-    public void OnSwipeLeft() {
-        FloppyMove(-1,0);
-    }
-
-    public void OnSwipeRight() {
-        FloppyMove(1, 0);
-    }
-
-    public void OnSwipeTop() {
-        FloppyMove(0,1);
-    }
-
-    public void OnSwipeBottom() {
-        FloppyMove(0,-1);
-    }
+    // private void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.LeftArrow))
+    //     {
+    //         OnSwipeLeft();
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.RightArrow))
+    //     {
+    //         OnSwipeRight();
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.UpArrow))
+    //     {
+    //         OnSwipeTop();
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.DownArrow))
+    //     {
+    //         OnSwipeBottom();
+    //     }
+    // }
+    //
+    // public void OnSwipeLeft() {
+    //     FloppyMove(-1,0);
+    // }
+    //
+    // public void OnSwipeRight() {
+    //     FloppyMove(1, 0);
+    // }
+    //
+    // public void OnSwipeTop() {
+    //     FloppyMove(0,1);
+    // }
+    //
+    // public void OnSwipeBottom() {
+    //     FloppyMove(0,-1);
+    //     
+    // }
     public enum TileStatus
     {
         // FlagRight_10,
@@ -503,5 +514,73 @@ public class ToolSolve : MonoBehaviour
         // Playing,
         // Paused,
         // GameOver
+    }
+    
+    public bool BackTracking()
+    {
+        if (Solved())
+        {
+            Debug.Log("Solved()");
+            return true;
+        }
+
+        TileData[,] tempAllCells = _allCells;
+        TileData tempFloppyPosition = floppyPosition;
+        for (int i = 1; i <= 4; i++)
+        {
+            switch (i)
+            {
+                case 1:
+                    if (FloppyMove(-1, 0, tempAllCells, tempFloppyPosition))
+                    {
+                        if (BackTracking())
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 2:
+                    if (FloppyMove(1, 0, tempAllCells, tempFloppyPosition))
+                    {
+                        if (BackTracking())
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 3:
+                    if (FloppyMove(0, 1, tempAllCells, tempFloppyPosition))
+                    {
+                        if (BackTracking())
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 4:
+                    if (FloppyMove(0, 1, tempAllCells, tempFloppyPosition))
+                    {
+                        if (BackTracking())
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return false;
+    }
+    public bool Solved()
+    {
+        for (int i = 0; i < flagTiles.Count; i++)
+        {
+            if (_allCells[flagTiles[i].x, flagTiles[i].y].typeTile == "10")
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
