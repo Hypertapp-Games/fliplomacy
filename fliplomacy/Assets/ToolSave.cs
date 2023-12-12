@@ -155,11 +155,13 @@ public class ToolSave : MonoBehaviour
         CheckSumWormHole();
     }
 
+    public int ChangingTileID = 0;
     public TMP_Dropdown ChangingTileDirection;
     
     public void OnFlafChangingCilck()
     {
-        string id = 4.ToString() + ChangingTileDirection.value.ToString();
+        string id = 4.ToString() + ChangingTileDirection.value.ToString()+ ChangingTileID;
+        ChangingTileID++;
         if(id[1] == '0')
         {
             AddTileFunc(id, FlagChaningDoc);
