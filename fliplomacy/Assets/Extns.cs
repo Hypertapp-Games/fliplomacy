@@ -50,4 +50,9 @@ public static class Extns
 
         var(zz);
     }
+    public static IEnumerator DelayedAction(this float delay, System.Action action)
+    {
+        yield return new WaitForSeconds(delay);
+        action.Invoke();
+    }
 }

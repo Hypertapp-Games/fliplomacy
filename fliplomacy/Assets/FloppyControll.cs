@@ -119,13 +119,12 @@ public class FloppyControll : MonoBehaviour
             floopySprite.transform.GetChild(0).gameObject.SetActive(true);
             Debug.Log("ShowTail");
         }
-        StartCoroutine(StartJump());
-        
+        StartCoroutine(0.03f.DelayedAction(StartJump));
     }
 
-    public IEnumerator StartJump()
+    public void StartJump()
     {
-        yield return new WaitForSeconds(0.03f);
+        //yield return new WaitForSeconds(0.03f);
         StopCoroutine("Shake");
         Jump();
     }
@@ -153,14 +152,14 @@ public class FloppyControll : MonoBehaviour
         {
             floopySprite.transform.GetChild(0).gameObject.SetActive(false);
             FloopySpriteMove(new Vector3(wormholeStartPosX, wormholeStartPosY, floopySprite.transform.position.z));
-            StartCoroutine(TeleportThroughWormholes());
+            //StartCoroutine(TeleportThroughWormholes());
+            StartCoroutine(0.2f.DelayedAction(TeleportThroughWormholes));
         }
     }
 
-    public IEnumerator TeleportThroughWormholes()
+    void TeleportThroughWormholes()
     {
-        yield return new WaitForSeconds(0.2f);
-
+        //yield return new WaitForSeconds(0.2f);
         var floopySpriteWormHoleClone = Instantiate(floopySprite, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, -2), quaternion.identity);
 
         StartCoroutine(0.5f.Tweeng((p) => floopySpriteWormHoleClone.transform.localScale = p,
@@ -169,7 +168,8 @@ public class FloppyControll : MonoBehaviour
 
         FloopySpriteScale(0.5f, new Vector3(0f, 0f, 0f));
 
-        StartCoroutine(EndTeleport(floopySpriteWormHoleClone));
+        //StartCoroutine(EndTeleport(floopySpriteWormHoleClone));
+        
     }
     IEnumerator EndTeleport(GameObject clone)
     {

@@ -6,25 +6,26 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using Object = UnityEngine.Object;
+[Serializable]
+public struct TileData
+{
+    public int x;
+    public int y;
+    public string typeTile;
+    public GameObject ob;
 
+    public TileData(int x, int y, string typeTile, GameObject ob)
+    {
+        this.x = x;
+        this.y = y;
+        this.typeTile = typeTile;
+        this.ob = ob;
+    }
+}
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    public struct AllCell
-    {
-        public int x;
-        public int y;
-        public string typeTile;
-        public GameObject ob;
-
-        public AllCell(int x, int y, string typeTile, GameObject ob)
-        {
-            this.x = x;
-            this.y = y;
-            this.typeTile = typeTile;
-            this.ob = ob;
-        }
-    }
+    //[Serializable]
+    
 
     public GameManagerReuse gameManagerReuse;
     public GameObject aCell;
@@ -36,37 +37,37 @@ public class GameManager : MonoBehaviour
 
     public GameObject Flags;
     public AnimationCurve flagscurve;
-    List<AllCell> FlagsAllCell = new List<AllCell>();
+    List<TileData> FlagsAllCell = new List<TileData>();
 
     public GameObject Disappearing;
     List<DisappearingTile> DisappearingObj = new List<DisappearingTile>();// dung cho Disappearing tile
 
     public GameObject Wormhole;
-    List<AllCell> WormholeAllCell = new List<AllCell>();
+    List<TileData> WormholeAllCell = new List<TileData>();
 
     List<Color> WormholeColor = new List<Color>();
     List<float> WormholeSpeed= new List<float>();
 
 
     public GameObject FlagChaningDoc;
-    List<AllCell> FlagChaningDocAllCells = new List<AllCell>();
+    List<TileData> FlagChaningDocAllCells = new List<TileData>();
     public GameObject FlagChaningNgang;
-    List<AllCell> FlagChaningNgangAllCells = new List<AllCell>();
+    List<TileData> FlagChaningNgangAllCells = new List<TileData>();
 
 
     public GameObject MovingTileSprite;
     List<MovingTileGroup> movingTileGroups = new List<MovingTileGroup>();
-    List<AllCell> MovingTilesAllCell = new List<AllCell>();
+    List<TileData> MovingTilesAllCell = new List<TileData>();
     public AnimationCurve movingTileGroupsCurve;
 
     public GameObject BombTileSprite;
-    List<AllCell> allBomb = new List<AllCell>();
+    List<TileData> allBomb = new List<TileData>();
 
     public GameObject BombMarketSprite;
-    List<AllCell> allBombMarked = new List<AllCell>();
+    List<TileData> allBombMarked = new List<TileData>();
 
-    [SerializeField] private AllCell[,] _allCells;
-    [SerializeField] private AllCell floppyPosition = new AllCell(0,0,"0",null);
+    [SerializeField] private TileData[,] _allCells;
+    [SerializeField] private TileData floppyPosition = new TileData(0,0,"0",null);
 
     public Object LevelSave;
     private void Start()
@@ -77,18 +78,7 @@ public class GameManager : MonoBehaviour
     }
     public void ClearLevelHaveAnim()
     {
-        FlagsAllCell.Clear();
-        DisappearingObj.Clear();
-        FlagChaningDocAllCells.Clear();
-        FlagChaningNgangAllCells.Clear();
-        WormholeAllCell.Clear();
-        MovingTilesAllCell.Clear();
-        allBomb.Clear();
-        allBombMarked.Clear();
-        foreach (MovingTileGroup mtv in movingTileGroups)
-        {
-            mtv.ClearLevel();
-        }
+        ClearData();
         floppyControll.StopAllAnim();
         StartCoroutine(0.5f.Tweeng((p) => allCell.localScale = p, allCell.localScale, new Vector3(0, 0, 0)));
         StartCoroutine(ClearLevelHaveAnim1());
@@ -96,7 +86,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator ClearLevelHaveAnim1()
     {
         yield return new WaitForSeconds(0.5f);
-        floppyPosition = new AllCell(0, 0, "0", null);
+        floppyPosition = new TileData(0, 0, "0", null);
         Floppy.transform.position = new Vector3(floppyPosition.x, floppyPosition.y, -1);
         floppyControll.ClearLevel();
         allCell.gameObject.GetComponent<CellsManager>().ClearLevel();
@@ -106,18 +96,7 @@ public class GameManager : MonoBehaviour
 
     public void ClearLevelAndReloadSceneHaveAnim()
     {
-        FlagsAllCell.Clear();
-        DisappearingObj.Clear();
-        FlagChaningDocAllCells.Clear();
-        FlagChaningNgangAllCells.Clear();
-        WormholeAllCell.Clear();
-        MovingTilesAllCell.Clear();
-        allBomb.Clear();
-        allBombMarked.Clear();
-        foreach (MovingTileGroup mtv in movingTileGroups)
-        {
-            mtv.ClearLevel();
-        }
+        ClearData();
         floppyControll.StopAllAnim();
         StartCoroutine(0.5f.Tweeng((p) => allCell.localScale = p, allCell.localScale, new Vector3(0, 0, 0)));
         StartCoroutine(ClearLevelAndReloadSceneHaveAnim1());
@@ -125,7 +104,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator ClearLevelAndReloadSceneHaveAnim1()
     {
         yield return new WaitForSeconds(0.5f);
-        floppyPosition = new AllCell(0, 0, "0", null);
+        floppyPosition = new TileData(0, 0, "0", null);
         Floppy.transform.position = new Vector3(floppyPosition.x, floppyPosition.y, -1);
         floppyControll.ClearLevel();
         allCell.gameObject.GetComponent<CellsManager>().ClearLevel();
@@ -134,6 +113,16 @@ public class GameManager : MonoBehaviour
 
     }
     public void ClearLevel()
+    {
+        ClearData();
+        floppyPosition = new TileData(0, 0, "0", null);
+        Floppy.transform.position = new Vector3(floppyPosition.x, floppyPosition.y, -1);
+        floppyControll.ClearLevel();
+        allCell.gameObject.GetComponent<CellsManager>().ClearLevel();
+        GetComponent<CheckWinCondition>().flagList.Clear();
+    }
+
+    public void ClearData()
     {
         FlagsAllCell.Clear();
         DisappearingObj.Clear();
@@ -147,11 +136,6 @@ public class GameManager : MonoBehaviour
         {
             mtv.ClearLevel();
         }
-        floppyPosition = new AllCell(0, 0, "0", null);
-        Floppy.transform.position = new Vector3(floppyPosition.x, floppyPosition.y, -1);
-        floppyControll.ClearLevel();
-        allCell.gameObject.GetComponent<CellsManager>().ClearLevel();
-        GetComponent<CheckWinCondition>().flagList.Clear();
     }
     public void CreateLevel()
     {
@@ -161,7 +145,7 @@ public class GameManager : MonoBehaviour
         movingTileGroups = new List<MovingTileGroup>(gameManagerReuse.movingTileGroups);
         WormholeColor = new List<Color>(gameManagerReuse.WormholeColor);
         WormholeSpeed = new List<float>(gameManagerReuse.WormholeSpeed);
-        _allCells = new AllCell[5, 5];
+        _allCells = new TileData[5, 5];
         var cellsdata = LevelSave.GetComponent<AllCellDate>().cellsData;
         for (int i = 0; i < cellsdata.Count; i++)
         {
@@ -228,18 +212,7 @@ public class GameManager : MonoBehaviour
                 else if (_allCells[i, j].typeTile[0] == '5')
                 {
                     MovingTilesAllCell.Add(_allCells[i, j]);
-                   
-
-                    //var tileMoving = tile.AddComponent<MovingTile>();
-                    //tileMoving.MovingTileSprite = MovingTileSprite;
-                    //tileMoving.SetUP();
-                    //allMovingTiles.Add(_allCells[i, j].ob);
-                    //var movingtilegroup = gameObject.GetComponent<MovingTileGroup>();
-                    //movingtilegroup.allMovingTile = allMovingTiles;
-                    //movingtilegroup.SetUp();
-                    //MovingtileGroup();
-                    // _allCells[i, j].typeTile = 1;
-                    //FlagChaningNgangObj.Add(_allCells[i, j].ob);
+                    
                 }
                 else if (_allCells[i, j].typeTile[0] == '6')
                 {
@@ -723,29 +696,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    //public void DisappearingHideTileFunction(int nextX, int nextY,
-    //    int x, int y, int startFloppyPositionx, int startFloppyPositiony)
-    //{
-    //    if (_allCells[nextX, nextY].typeTile == 20.ToString()) // DisappearingHideTile
-    //    {
-    //        nextX += x;
-    //        nextY += y;
-    //        if (_allCells[nextX, nextY].typeTile == 20.ToString())
-    //        {
-    //            DisappearingHideTileFunction(nextX, nextY, x, y, startFloppyPositionx, startFloppyPositiony);
-    //        }
-    //        else if (nextX < 5 && nextX >= 0 && nextY >= 0 && nextY < 5)
-    //        {
-    //            FloppyJump(nextX, nextY);
-    //            //endstep
-    //        }
-    //        else
-    //        {
-    //            FloppyJump(startFloppyPositionx, startFloppyPositiony);
-    //            //endstep
-    //        }
-    //    }
-    //}
+
     public void DisappearingCheckOnIt(int nextX, int nextY)
     {
         FloppyJump(nextX, nextY);
@@ -800,57 +751,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.19f);
         _allCells[nextX, nextY].ob.GetComponent<FlagChaningTile>().ChangeFlag();
-        // if (direction == "Top")
-        // {
-        //     for (int i = 0; i < FlagsAllCell.Count; i++)
-        //     {
-        //         if (FlagsAllCell[i].x == _allCells[nextX, nextY].x)
-        //         {
-        //             FlagsAllCell[i].ob.GetComponent<FlagTile>().ChangeFlag("Top");
-        //         }
-        //     }
-        // }
-        // else if (direction == "Left")
-        // {
-        //     for (int i = 0; i < FlagsAllCell.Count; i++)
-        //     {
-        //         if (FlagsAllCell[i].y == _allCells[nextX, nextY].y)
-        //         {
-        //             FlagsAllCell[i].ob.GetComponent<FlagTile>().ChangeFlag("Left");
-        //         }
-        //     }
-        // }
     }
-    // public IEnumerator FlagChangGameAnimation()
-    // {
-    //     var w = true;
-    //     while (w)
-    //     {
-    //         int Condition = 0; 
-    //         for (int i = 0; i < flagList.Count; i++)
-    //         {
-    //             if (!flagList[i].rotatingFlag)
-    //             {
-    //                 Condition++;
-    //             }
-    //         }
-    //         if (Condition == flagList.Count)
-    //         {
-    //             for (int i = 0; i < flagList.Count; i++)
-    //             {
-    //                 flagList[i].WinGameAnin("WinGameAnin" + i, color, curve, squareWave);
-    //             }
-    //             uIManager.WinGame();
-    //             w = false;
-    //         }
-    //
-    //         yield return null;
-    //     }
-    // }
-
-
-
-
     public void HideDisappearingTileAfterJumpOut()
     {
         if(DisappearingObj.Count > 0)
@@ -858,6 +759,15 @@ public class GameManager : MonoBehaviour
             DisappearingObj[0].HideObject();
             DisappearingObj.Clear();
         }
+    }
+
+    public void StartSolve_Button()
+    {
+        
+    }
+    void GameSolve()
+    {
+        
     }
 
 }
