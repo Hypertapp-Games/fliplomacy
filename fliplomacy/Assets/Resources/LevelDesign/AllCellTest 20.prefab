@@ -2045,7 +2045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idX: 2
   idY: 2
-  cellID: 41
+  cellID: 411
 --- !u!65 &3616503852216195418
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3272,7 +3272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idX: 1
   idY: 1
-  cellID: 40
+  cellID: 400
 --- !u!65 &3616503852979646570
 BoxCollider:
   m_ObjectHideFlags: 0

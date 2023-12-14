@@ -1680,7 +1680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8144865260457635686, guid: 1d798e50250d34fc78edbeba789b7309, type: 3}
       propertyPath: m_Name
-      value: Floppy (1)
+      value: Floppy
       objectReference: {fileID: 0}
     - target: {fileID: 8144865260457635686, guid: 1d798e50250d34fc78edbeba789b7309, type: 3}
       propertyPath: m_IsActive
@@ -3155,7 +3155,7 @@ MonoBehaviour:
   aCell: {fileID: 8369605982097539810, guid: 0de9aaec41eca47aa91be4f626e38a5b, type: 3}
   floppy: {fileID: 1880641645}
   sprite: []
-  LevelSave: {fileID: 1156985143560486625, guid: beb6199c99166c043a6967753c085956, type: 3}
+  LevelSave: {fileID: 9048217012527467738, guid: 2e9e554e33ee14a6eb15813797064e01, type: 3}
   floppyPosition:
     x: 0
     y: 0
