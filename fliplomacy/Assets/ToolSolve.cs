@@ -526,50 +526,88 @@ public class ToolSolve : MonoBehaviour
 
         TileData[,] tempAllCells = _allCells;
         TileData tempFloppyPosition = floppyPosition;
+
+        List<string> directions = new List<string>();
         for (int i = 1; i <= 4; i++)
         {
             switch (i)
             {
                 case 1:
-                    if (FloppyMove(-1, 0, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(-1, 0, tempAllCells, tempFloppyPosition))
                     {
-                        if (BackTracking())
-                        {
-                            return true;
-                        }
+                        directions.Add("left");
                     }
                     break;
                 case 2:
-                    if (FloppyMove(1, 0, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(1, 0, tempAllCells, tempFloppyPosition))
                     {
-                        if (BackTracking())
-                        {
-                            return true;
-                        }
+                        directions.Add("right");
                     }
                     break;
                 case 3:
-                    if (FloppyMove(0, 1, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(0, 1, tempAllCells, tempFloppyPosition))
                     {
-                        if (BackTracking())
-                        {
-                            return true;
-                        }
+                        directions.Add("top");
                     }
                     break;
                 case 4:
-                    if (FloppyMove(0, 1, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(0, -1, tempAllCells, tempFloppyPosition))
                     {
-                        if (BackTracking())
-                        {
-                            return true;
-                        }
+                        directions.Add("bottom");
                     }
                     break;
                 default:
                     break;
             }
         }
+        if (directions.Count == 0)
+            return false;
+
+        foreach (string direction in directions)
+        {
+            switch (direction)
+            {
+                case "left":
+
+                    FloppyMove(-1, 0, tempAllCells, tempFloppyPosition);
+                    if (BackTracking())
+                    {
+                        return true;
+                    }
+                    break;
+                case "right":
+
+                    FloppyMove(1, 0, tempAllCells, tempFloppyPosition);
+
+                    if (BackTracking())
+                    {
+                        return true;
+                    }
+
+                    break;
+                case "top":
+
+                    FloppyMove(0, 1, tempAllCells, tempFloppyPosition);
+
+                    if (BackTracking())
+                    {
+                        return true;
+                    }
+
+                    break;
+                case "bottom":
+
+                    FloppyMove(0, -1, tempAllCells, tempFloppyPosition);
+
+                    if (BackTracking())
+                    {
+                        return true;
+                    }
+
+                    break;
+            }
+        }
+
         return false;
     }
     public bool Solved()
@@ -582,5 +620,22 @@ public class ToolSolve : MonoBehaviour
             }
         }
         return true;
+    }
+    bool CheckCanMove(int direction_X, int direction_Y, TileData[,] tempallcell, TileData tempfloppy)
+    {
+        _allCells = tempallcell;
+        floppyPosition = tempfloppy;
+        var nextX = floppyPosition.x + direction_X;
+        var nextY = floppyPosition.y + direction_Y;
+        List<TileData> allFlagChanging = new List<TileData>();
+
+        bool canMove = false;
+        if (CheckTileJumpOn(direction_X, direction_Y, ref nextX, ref nextY, allFlagChanging, ref disappearingTile))
+        {
+            canMove = true;
+        }
+
+        LoadTileVisual();
+        return canMove;
     }
 }
