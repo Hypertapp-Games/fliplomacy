@@ -30,6 +30,9 @@ public class ToolSolve : MonoBehaviour
     
     private List<TileData> bombMarkedTiles = new List<TileData>();
     private Dictionary<int, List<TileData>> bombMarkedTileGroup = new Dictionary<int, List<TileData>>();
+    
+    [SerializeField] private TileData floppyPosition = new TileData(0,0,"0",null);
+    private TileData disappearingTile = new TileData(0,0,"20",null);
 
     private void Start()
     {
@@ -44,6 +47,7 @@ public class ToolSolve : MonoBehaviour
         floppyPosition.ob = floppy;
 
         CreateLevel();
+        ReLoad();
         BackTracking(counting);
     }
    
@@ -100,10 +104,7 @@ public class ToolSolve : MonoBehaviour
         SortBombMarkedIntoGroup();
         LoadTileVisual();
     }
-
     
-    [SerializeField] private TileData floppyPosition = new TileData(0,0,"0",null);
-    private TileData disappearingTile = new TileData(0,0,"20",null);
     bool FloppyMove(int direction_X, int direction_Y)
     {
         var nextX = floppyPosition.x + direction_X;
@@ -479,6 +480,11 @@ public class ToolSolve : MonoBehaviour
         {
             OnSwipeBottom();
         }
+
+        // if (Input.GetKeyDown(KeyCode.V))
+        // {
+        //     CallBackTracking();
+        // }
     }
     
     public void OnSwipeLeft() {
@@ -499,17 +505,49 @@ public class ToolSolve : MonoBehaviour
     }
 
     private int counting = 0;
+    private int checking = 0;
+
+    private TileData[,] ttempAllCells;
+    private TileData ttempFloppyPosition = new TileData();
+    private TileData ttempDisappearingTile = new TileData();
+    
+    void ReLoad()
+    {
+       ttempAllCells = _allCells.Clone() as TileData[,];
+       ttempFloppyPosition = floppyPosition;
+       ttempDisappearingTile = disappearingTile;
+    }
+
+    
+    private int chk = 0;
+    void CallBackTracking()
+    {
+        Debug.Log("new daily");
+        _allCells = ttempAllCells.Clone() as TileData[,];
+        floppyPosition = ttempFloppyPosition;
+        disappearingTile = ttempDisappearingTile;
+        LoadTileVisual();
+        checking = 0;
+        counting = 0;
+        chk++;
+        BackTracking(counting);
+    }
     
     public bool BackTracking(int countingg)
     {
         countingg++;
+        // checking++;
+        // if (checking == chk)
+        // {
+        //     return true;
+        // }
         if (Solved())
         {
             Debug.Log("Solved()");
             return true;
         }
 
-        TileData[,] tempAllCells = _allCells;
+        TileData[,] tempAllCells = _allCells.Clone() as TileData[,];
         TileData tempFloppyPosition = floppyPosition;
         TileData tempDisappearingTile = disappearingTile;
 
@@ -566,7 +604,7 @@ public class ToolSolve : MonoBehaviour
                     else
                     {
                         Debug.Log("back");
-                        _allCells = tempAllCells;
+                        _allCells = tempAllCells.Clone() as TileData[,];
                         floppyPosition = tempFloppyPosition;
                         disappearingTile = tempDisappearingTile;
                         LoadTileVisual();
@@ -583,7 +621,7 @@ public class ToolSolve : MonoBehaviour
                     else
                     {
                         Debug.Log("back");
-                        _allCells = tempAllCells;
+                        _allCells = tempAllCells.Clone() as TileData[,];
                         floppyPosition = tempFloppyPosition;
                         disappearingTile = tempDisappearingTile;
                         LoadTileVisual();
@@ -601,7 +639,7 @@ public class ToolSolve : MonoBehaviour
                     else
                     {
                         Debug.Log("back");
-                        _allCells = tempAllCells;
+                        _allCells = tempAllCells.Clone() as TileData[,];
                         floppyPosition = tempFloppyPosition;
                         disappearingTile = tempDisappearingTile;
                         LoadTileVisual();
@@ -619,7 +657,7 @@ public class ToolSolve : MonoBehaviour
                     else
                     {
                         Debug.Log("back");
-                        _allCells = tempAllCells;
+                        _allCells = tempAllCells.Clone() as TileData[,];
                         floppyPosition = tempFloppyPosition;
                         disappearingTile = tempDisappearingTile;
                         LoadTileVisual();
