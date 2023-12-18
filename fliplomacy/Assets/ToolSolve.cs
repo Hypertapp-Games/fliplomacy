@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -45,7 +44,7 @@ public class ToolSolve : MonoBehaviour
         floppyPosition.ob = floppy;
 
         CreateLevel();
-        BackTracking();
+        BackTracking(counting);
     }
    
     void CreateLevel()
@@ -105,10 +104,8 @@ public class ToolSolve : MonoBehaviour
     
     [SerializeField] private TileData floppyPosition = new TileData(0,0,"0",null);
     private TileData disappearingTile = new TileData(0,0,"20",null);
-    bool FloppyMove(int direction_X, int direction_Y, TileData[,] tempallcell, TileData tempfloppy)
+    bool FloppyMove(int direction_X, int direction_Y)
     {
-        _allCells = tempallcell;
-        floppyPosition = tempfloppy;
         var nextX = floppyPosition.x + direction_X;
         var nextY = floppyPosition.y + direction_Y;
         List<TileData> allFlagChanging = new List<TileData>();
@@ -156,7 +153,7 @@ public class ToolSolve : MonoBehaviour
                 if (disappearingTile.typeTile != "20")
                 {
                     TileHidingChangeTypeTile(disappearingTile);
-                    Debug.Log("disappearingTile");
+                   // Debug.Log("disappearingTile");
                 }
                 
                 switch (tileType)
@@ -172,7 +169,7 @@ public class ToolSolve : MonoBehaviour
                         tileY = connectedTile.y;
                         break;
                     case '4':
-                        Debug.Log("changingflag");
+                        //Debug.Log("changingflag");
                         ChangeConnectFlag(tile);
                         break;
                     case '5':
@@ -464,59 +461,46 @@ public class ToolSolve : MonoBehaviour
          }
      }
 
-    // private void Update()
-    // {
-    //     if (Input.GetKeyDown(KeyCode.LeftArrow))
-    //     {
-    //         OnSwipeLeft();
-    //     }
-    //     if (Input.GetKeyDown(KeyCode.RightArrow))
-    //     {
-    //         OnSwipeRight();
-    //     }
-    //     if (Input.GetKeyDown(KeyCode.UpArrow))
-    //     {
-    //         OnSwipeTop();
-    //     }
-    //     if (Input.GetKeyDown(KeyCode.DownArrow))
-    //     {
-    //         OnSwipeBottom();
-    //     }
-    // }
-    //
-    // public void OnSwipeLeft() {
-    //     FloppyMove(-1,0);
-    // }
-    //
-    // public void OnSwipeRight() {
-    //     FloppyMove(1, 0);
-    // }
-    //
-    // public void OnSwipeTop() {
-    //     FloppyMove(0,1);
-    // }
-    //
-    // public void OnSwipeBottom() {
-    //     FloppyMove(0,-1);
-    //     
-    // }
-    public enum TileStatus
+    private void Update()
     {
-        // FlagRight_10,
-        // FlagWrong_11,
-        // DisappearingShow_2,
-        // DispaaearingHide_20,
-        // WormHole_3,
-        // FlagChaningWidth_40,
-        // FlagChangingHeight_41,
-        // MovingTiles_5,
-        // MainMenu,
-        // Playing,
-        // Paused,
-        // GameOver
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            OnSwipeLeft();
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            OnSwipeRight();
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            OnSwipeTop();
+        }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            OnSwipeBottom();
+        }
     }
     
-    public bool BackTracking()
+    public void OnSwipeLeft() {
+        FloppyMove(-1,0);
+    }
+    
+    public void OnSwipeRight() {
+        FloppyMove(1, 0);
+    }
+    
+    public void OnSwipeTop() {
+        FloppyMove(0,1);
+    }
+    
+    public void OnSwipeBottom() {
+        FloppyMove(0,-1);
+        
+    }
+
+    private int counting = 0;
+    
+    public bool BackTracking(int counting)
     {
         if (Solved())
         {
@@ -528,82 +512,108 @@ public class ToolSolve : MonoBehaviour
         TileData tempFloppyPosition = floppyPosition;
 
         List<string> directions = new List<string>();
+        
         for (int i = 1; i <= 4; i++)
         {
             switch (i)
             {
                 case 1:
-                    if (CheckCanMove(-1, 0, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(-1, 0))
                     {
                         directions.Add("left");
                     }
                     break;
                 case 2:
-                    if (CheckCanMove(1, 0, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(1, 0))
                     {
                         directions.Add("right");
                     }
                     break;
                 case 3:
-                    if (CheckCanMove(0, 1, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(0, 1))
                     {
                         directions.Add("top");
                     }
                     break;
                 case 4:
-                    if (CheckCanMove(0, -1, tempAllCells, tempFloppyPosition))
+                    if (CheckCanMove(0, -1))
                     {
                         directions.Add("bottom");
                     }
                     break;
-                default:
-                    break;
             }
         }
-        if (directions.Count == 0)
-            return false;
 
+        if (directions.Count == 0)
+        {
+            Debug.Log("directions = 0");
+            return false;
+        }
+        
         foreach (string direction in directions)
         {
             switch (direction)
             {
                 case "left":
-
-                    FloppyMove(-1, 0, tempAllCells, tempFloppyPosition);
-                    if (BackTracking())
+                    Debug.Log("counting " + counting +": left");
+                    FloppyMove(-1, 0);
+                    if (BackTracking(counting++))
                     {
                         return true;
                     }
+                    else
+                    {
+                        Debug.Log("back");
+                        _allCells = tempAllCells;
+                        floppyPosition = tempFloppyPosition;
+                    }
                     break;
                 case "right":
-
-                    FloppyMove(1, 0, tempAllCells, tempFloppyPosition);
-
-                    if (BackTracking())
+                    Debug.Log("counting " + counting +": right");
+                    FloppyMove(1, 0);
+                    
+                    if (BackTracking(counting++))
                     {
                         return true;
+                    }
+                    else
+                    {
+                        Debug.Log("back");
+                        _allCells = tempAllCells;
+                        floppyPosition = tempFloppyPosition;
                     }
 
                     break;
                 case "top":
+                    Debug.Log("counting " + counting +": top");
+                    FloppyMove(0, 1);
 
-                    FloppyMove(0, 1, tempAllCells, tempFloppyPosition);
-
-                    if (BackTracking())
+                    if (BackTracking(counting++))
                     {
                         return true;
+                    }
+                    else
+                    {
+                        Debug.Log("back");
+                        _allCells = tempAllCells;
+                        floppyPosition = tempFloppyPosition;
                     }
 
                     break;
                 case "bottom":
+                    Debug.Log("counting " + counting +": bottom");
+                    FloppyMove(0, -1);
 
-                    FloppyMove(0, -1, tempAllCells, tempFloppyPosition);
-
-                    if (BackTracking())
+                    if (BackTracking(counting++))
                     {
                         return true;
                     }
-
+                    else
+                    {
+                        Debug.Log("back");
+                        _allCells = tempAllCells;
+                        floppyPosition = tempFloppyPosition;
+                    }
                     break;
             }
         }
@@ -621,21 +631,32 @@ public class ToolSolve : MonoBehaviour
         }
         return true;
     }
-    bool CheckCanMove(int direction_X, int direction_Y, TileData[,] tempallcell, TileData tempfloppy)
+    bool CheckCanMove(int direction_X, int direction_Y)
     {
-        _allCells = tempallcell;
-        floppyPosition = tempfloppy;
         var nextX = floppyPosition.x + direction_X;
         var nextY = floppyPosition.y + direction_Y;
-        List<TileData> allFlagChanging = new List<TileData>();
-
-        bool canMove = false;
-        if (CheckTileJumpOn(direction_X, direction_Y, ref nextX, ref nextY, allFlagChanging, ref disappearingTile))
-        {
-            canMove = true;
-        }
-
-        LoadTileVisual();
+        bool canMove = CheckTileJumpOn(direction_X, direction_Y, ref nextX, ref nextY);
         return canMove;
+    }
+    bool CheckTileJumpOn(int direction_X , int direction_Y, ref int tileX,  ref int tileY)
+    {
+        if (tileX < 5 && tileX >= 0 && tileY >= 0 && tileY < 5) // && _allCells[nextX, nextY].typeTile != 20)
+        {
+            TileData tile = _allCells[tileX, tileY];
+            char tileType = tile.typeTile[0];
+            
+            if (tileType == '1')
+            {
+                tileX += direction_X;
+                tileY += direction_Y;
+                return CheckTileJumpOn(direction_X, direction_Y, ref tileX, ref tileY);
+            }
+            
+            if (ISTileCanMoveOn(tile.typeTile))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
