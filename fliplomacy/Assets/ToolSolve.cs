@@ -450,7 +450,7 @@ public class ToolSolve : MonoBehaviour
                 }
             }
         }
-    }
+        floppyPosition.ob.transform.position = new Vector3(floppyPosition.x, floppyPosition.y);    }
      
      void FindingObjectAndShow(List<Transform> child,string nameObject)
      {
@@ -500,8 +500,9 @@ public class ToolSolve : MonoBehaviour
 
     private int counting = 0;
     
-    public bool BackTracking(int counting)
+    public bool BackTracking(int countingg)
     {
+        countingg++;
         if (Solved())
         {
             Debug.Log("Solved()");
@@ -510,6 +511,7 @@ public class ToolSolve : MonoBehaviour
 
         TileData[,] tempAllCells = _allCells;
         TileData tempFloppyPosition = floppyPosition;
+        TileData tempDisappearingTile = disappearingTile;
 
         List<string> directions = new List<string>();
         
@@ -549,15 +551,15 @@ public class ToolSolve : MonoBehaviour
             Debug.Log("directions = 0");
             return false;
         }
-        
         foreach (string direction in directions)
         {
             switch (direction)
             {
                 case "left":
-                    Debug.Log("counting " + counting +": left");
+                    Debug.Log("counting " + countingg +": left");
                     FloppyMove(-1, 0);
-                    if (BackTracking(counting++))
+                    
+                    if (BackTracking(countingg))
                     {
                         return true;
                     }
@@ -566,13 +568,15 @@ public class ToolSolve : MonoBehaviour
                         Debug.Log("back");
                         _allCells = tempAllCells;
                         floppyPosition = tempFloppyPosition;
+                        disappearingTile = tempDisappearingTile;
+                        LoadTileVisual();
                     }
                     break;
                 case "right":
-                    Debug.Log("counting " + counting +": right");
+                    Debug.Log("counting " + countingg +": right");
                     FloppyMove(1, 0);
                     
-                    if (BackTracking(counting++))
+                    if (BackTracking(countingg))
                     {
                         return true;
                     }
@@ -581,14 +585,16 @@ public class ToolSolve : MonoBehaviour
                         Debug.Log("back");
                         _allCells = tempAllCells;
                         floppyPosition = tempFloppyPosition;
+                        disappearingTile = tempDisappearingTile;
+                        LoadTileVisual();
                     }
 
                     break;
                 case "top":
-                    Debug.Log("counting " + counting +": top");
+                    Debug.Log("counting " + countingg +": top");
                     FloppyMove(0, 1);
 
-                    if (BackTracking(counting++))
+                    if (BackTracking(countingg))
                     {
                         return true;
                     }
@@ -597,14 +603,16 @@ public class ToolSolve : MonoBehaviour
                         Debug.Log("back");
                         _allCells = tempAllCells;
                         floppyPosition = tempFloppyPosition;
+                        disappearingTile = tempDisappearingTile;
+                        LoadTileVisual();
                     }
 
                     break;
                 case "bottom":
-                    Debug.Log("counting " + counting +": bottom");
+                    Debug.Log("counting " + countingg +": bottom");
                     FloppyMove(0, -1);
 
-                    if (BackTracking(counting++))
+                    if (BackTracking(countingg))
                     {
                         return true;
                     }
@@ -613,6 +621,8 @@ public class ToolSolve : MonoBehaviour
                         Debug.Log("back");
                         _allCells = tempAllCells;
                         floppyPosition = tempFloppyPosition;
+                        disappearingTile = tempDisappearingTile;
+                        LoadTileVisual();
                     }
                     break;
             }
